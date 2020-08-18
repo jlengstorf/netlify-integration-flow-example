@@ -34,7 +34,7 @@ export function NetlifyOAuth() {
 
     async function loadSites() {
       const response = await fetch(
-        'https://api.netlify.com/api/v1/sites?filter=all&sort_by=updated_at&page=1&per_page=50',
+        'https://api.netlify.com/api/v1/sites?filter=all&sort_by=updated_at',
         {
           headers: {
             Authorization: `Bearer ${token}`,
