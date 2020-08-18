@@ -72,6 +72,26 @@ export function NetlifyOAuth() {
         alert('please choose a site!');
       }
 
+      const environmentVariables = {
+        // make sure to keep any existing environment variables!
+        ...selectedSite.build_settings.env,
+
+        // define any environment variables required for your integration
+        ENV_VAR_NAME: 'some env var value',
+      };
+
+      // add plugins and filter to avoid any duplicates
+      const plugins = [
+        // make sure to keep the existing plugins
+        ...selectedSite.plugins,
+
+        // add your integration’s required plugin(s) here
+        { package: 'netlify-plugin-minify-html' },
+      ].filter(
+        (plugin, index, allPlugins) =>
+          index === allPlugins.findIndex((p) => p.package === plugin.package),
+      );
+
       // set the env vars and install the build plugin
       await fetch(`https://api.netlify.com/api/v1/sites/${selectedSite.id}`, {
         method: 'PUT',
@@ -81,11 +101,9 @@ export function NetlifyOAuth() {
         },
         body: JSON.stringify({
           build_settings: {
-            env: {
-              ENV_VAR_NAME: 'some env var value',
-            },
+            env: environmentVariables,
           },
-          plugins: [{ package: 'netlify-plugin-minify-html' }],
+          plugins,
         }),
       });
 
