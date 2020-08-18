@@ -12,7 +12,9 @@ function createAuthClient(credentials) {
 
 module.exports = {
   // the URL of your OAuth callback handler
-  redirect_uri: `${process.env.URL}/.netlify/functions/auth-callback`,
+  redirect_uri:
+    process.env.NETLIFY_OAUTH_REDIRECT_URI ||
+    `${process.env.URL}/.netlify/functions/auth-callback`,
   oauth: createAuthClient({
     client: {
       // generate a client ID & secret at https://app.netlify.com/user/applications
