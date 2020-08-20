@@ -47,7 +47,9 @@ After saving your app, you’ll be provided with a client ID and secret.
 Add those to your site’s environment variables along with the Redirect URI:
 
 ```
+NETLIFY_OAUTH_REDIRECT_URI=<your Netlify OAuth app redirect URI>
 NETLIFY_OAUTH_CLIENT_ID=<your Netlify OAuth app client ID>
+NETLIFY_OAUTH_CLIENT_SECRET=<your Netlify OAuth app secret>
 ```
 
 ### Request an authorization code
