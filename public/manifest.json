@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "https://res.cloudinary.com/jlengstorf/image/upload/f_auto,w_192,q_auto/v1596146333/netlify/netliheart.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "https://res.cloudinary.com/jlengstorf/image/upload/f_auto,w_512,q_auto/v1596146333/netlify/netliheart.png",
       "type": "image/png",
       "sizes": "512x512"
     }
