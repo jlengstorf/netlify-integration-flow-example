@@ -1,4 +1,4 @@
-const { redirect_uri, oauth } = require('./util/oauth');
+const oauth = require('./util/oauth');
 
 exports.handler = async (event) => {
   if (!event.queryStringParameters) {
@@ -10,14 +10,14 @@ exports.handler = async (event) => {
     };
   }
 
-  const { csrf: csrfToken, url: redirectURL } = event.queryStringParameters;
+  const { csrf: csrfToken, url } = event.queryStringParameters;
 
   const authorizationURI = oauth.authorizeURL({
-    redirect_uri,
-    state: `url=${redirectURL}&csrf=${csrfToken}`,
+    redirect_uri: process.env.NETLIFY_OAUTH_REDIRECT_URI,
+    state: `url=${url}&csrf=${csrfToken}`,
 
-    // for now, this is always blank. in the future, specific scopes will need
-    // to be requested to perform actions on the user’s behalf
+    // for now, this is always blank. in the future, specific scopes will be
+    // required to perform actions on the user’s behalf
     scope: '',
   });
 

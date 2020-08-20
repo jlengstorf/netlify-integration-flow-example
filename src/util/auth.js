@@ -1,38 +1,48 @@
 import { v4 as uuid } from 'uuid';
 
-export function generateCsrfToken() {
-  return uuid();
+export function redirectToAuth(returnURL) {
+  const { location, localStorage } = window;
+
+  // prevent shenanigans using a CSRF token
+  // see https://owasp.org/www-community/attacks/csrf
+  const csrfToken = uuid();
+
+  // store the token so we can use it later for validation
+  localStorage.setItem(csrfToken, 'true');
+
+  // tell the auth flow where to go once you have a token
+  const successURL = returnURL || `${location.origin}${location.pathname}`;
+
+  // redirect to start the OAuth flow
+  window.location.href = `/.netlify/functions/auth-start?url=${successURL}&csrf=${csrfToken}`;
 }
 
-function parseHash(hash) {
-  if (!hash) return {};
+export function getTokenFromHash() {
+  // if there’s no hash, do nothing
+  if (!window.location.hash) {
+    return;
+  }
 
-  const querystring = hash.replace(/^#/, '');
-  return Object.fromEntries(new URLSearchParams(querystring).entries());
-}
+  // if there’s a hash, remove the # and parse the rest as a query string
+  const querystring = window.location.hash.replace(/^#/, '');
+  const { token, csrf } = Object.fromEntries(
+    new URLSearchParams(querystring).entries(),
+  );
 
-function removeHash() {
+  // make sure the CSRF token matches the one stored in the user’s browser
+  if (token && !localStorage.getItem(csrf)) {
+    throw new Error('Invalid token. Please retry logging in.');
+  }
+
+  // after confirming the CSRF is valid we can clean up after ourselves
+  localStorage.removeItem(csrf);
+
+  // remove the hash from the URL so no one accidentally copy-pastes it
   window.history.pushState(
     '',
     document.title,
     window.location.pathname + window.location.search,
   );
-}
 
-export function validateHash(hash) {
-  const response = parseHash(hash);
-
-  // protect against CSRF by checking the CSRF token
-  // for details, see https://owasp.org/www-community/attacks/csrf
-  if (response.token && !localStorage.getItem(response.csrf)) {
-    throw new Error('Invalid token. Please retry logging in.');
-  }
-
-  // if we get here, the CSRF is valid and we can clean up after ourselves
-  localStorage.removeItem(response.csrf);
-
-  // remove the hash from the URL so no one accidentally copy-pastes it
-  removeHash();
-
-  return response;
+  return token;
 }

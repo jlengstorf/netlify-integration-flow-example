@@ -14,8 +14,33 @@
 .main {
   color: #444;
   margin: 5rem auto;
-  max-width: 400px;
+  max-width: 600px;
   width: 90vw;
+}
+
+.auth {
+  text-align: center;
+}
+
+.auth h1 {
+  margin: 0;
+}
+
+.auth p {
+  margin: 1rem 0 2rem;
+}
+
+button {
+  background: teal;
+  border: 0;
+  border-radius: 0.5rem;
+  color: white;
+  display: block;
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin: 0 auto;
+  padding: 1rem 0.5rem;
+  width: 300px;
 }
 
 .footer {

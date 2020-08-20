@@ -1,5 +1,5 @@
 const qs = require('querystring');
-const { redirect_uri, oauth } = require('./util/oauth');
+const oauth = require('./util/oauth');
 
 exports.handler = async (event) => {
   if (!event.queryStringParameters) {
@@ -17,7 +17,7 @@ exports.handler = async (event) => {
     // exchange for an access token
     const { token } = await oauth.getToken({
       code,
-      redirect_uri,
+      redirect_uri: process.env.NETLIFY_OAUTH_REDIRECT_URI,
     });
 
     return {

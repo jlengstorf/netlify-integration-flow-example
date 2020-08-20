@@ -10,21 +10,15 @@ function createAuthClient(credentials) {
   return new AuthorizationCode(credentials);
 }
 
-module.exports = {
-  // the URL of your OAuth callback handler
-  redirect_uri:
-    process.env.NETLIFY_OAUTH_REDIRECT_URI ||
-    `${process.env.URL}/.netlify/functions/auth-callback`,
-  oauth: createAuthClient({
-    client: {
-      // generate a client ID & secret at https://app.netlify.com/user/applications
-      id: process.env.NETLIFY_OAUTH_CLIENT_ID,
-      secret: process.env.NETLIFY_OAUTH_CLIENT_SECRET,
-    },
-    auth: {
-      tokenHost: 'https://api.netlify.com',
-      tokenPath: 'https://api.netlify.com/oauth/token',
-      authorizePath: 'https://app.netlify.com/authorize',
-    },
-  }),
-};
+module.exports = createAuthClient({
+  client: {
+    // generate a client ID & secret at https://app.netlify.com/user/applications
+    id: process.env.NETLIFY_OAUTH_CLIENT_ID,
+    secret: process.env.NETLIFY_OAUTH_CLIENT_SECRET,
+  },
+  auth: {
+    tokenHost: 'https://api.netlify.com',
+    tokenPath: 'https://api.netlify.com/oauth/token',
+    authorizePath: 'https://app.netlify.com/authorize',
+  },
+});

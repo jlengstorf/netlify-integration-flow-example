@@ -1,164 +1,64 @@
 import React, { useEffect, useState } from 'react';
-import { generateCsrfToken, validateHash } from '../util/auth.js';
+import { redirectToAuth, getTokenFromHash } from '../util/auth.js';
+import { updateSiteSettings, createDeploy } from '../util/netlify-api';
+import { SelectSite } from './select-site';
+import styles from '../styles/app.module.css';
 
 export function NetlifyOAuth() {
   const [token, setToken] = useState();
-  const [loading, setLoading] = useState(true);
-  const [allSites, setSites] = useState();
-  const [selectedSite, setSelectedSite] = useState();
   const [deploy, setDeploy] = useState(false);
 
   useEffect(() => {
-    const response = validateHash(window.location.hash);
-
-    setToken(response.token);
+    // if an authorization code exists, grab it from the hash and validate it
+    setToken(getTokenFromHash());
   }, []);
 
-  function handleAuth(event) {
-    event.preventDefault();
+  async function configureSelectedSite(site) {
+    await updateSiteSettings({
+      site,
+      token,
+      env: {
+        // set any environment variable(s) required for your integration here
+        ENV_VAR_NAME: 'some env var value',
+      },
+      plugins: [
+        // add any build plugin(s) required for your integration here
+        { package: 'netlify-plugin-minify-html' },
+      ],
+    });
 
-    const { location, localStorage } = window;
-    const csrfToken = generateCsrfToken();
+    // trigger a new build so your integration takes effect
+    const deployURL = await createDeploy({ site, token });
 
-    localStorage.setItem(csrfToken, 'true');
-
-    const redirectURL = `${location.origin}${location.pathname}`;
-
-    window.location.href = `/.netlify/functions/auth-start?url=${redirectURL}&csrf=${csrfToken}`;
+    setDeploy(deployURL);
   }
 
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
+  // if we have a valid token, show the site selector
+  if (token && !deploy) {
+    return <SelectSite token={token} submitCallback={configureSelectedSite} />;
+  }
 
-    async function loadSites() {
-      const response = await fetch(
-        'https://api.netlify.com/api/v1/sites?filter=all&sort_by=updated_at',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      ).then((res) => res.json());
-
-      setSites(response);
-      setLoading(false);
-    }
-
-    loadSites();
-  }, [token]);
-
+  // if a new deploy has been created, show the confirmation screen
   if (deploy) {
     return (
       <p>
         Successfully configured! Your site is rebuilding now with our plugin
-        installed.{' '}
-        <a
-          href={`https://app.netlify.com/sites/${selectedSite.name}/deploys/${deploy.deploy_id}`}
-        >
-          See the deploy log.
-        </a>
+        installed. <a href={deploy}>See the deploy log.</a>
       </p>
     );
   }
 
-  if (allSites) {
-    async function handleSubmit(event) {
-      event.preventDefault();
-
-      if (!selectedSite) {
-        alert('please choose a site!');
-      }
-
-      const environmentVariables = {
-        // make sure to keep any existing environment variables!
-        ...selectedSite.build_settings.env,
-
-        // define any environment variables required for your integration
-        ENV_VAR_NAME: 'some env var value',
-      };
-
-      // add plugins and filter to avoid any duplicates
-      const plugins = [
-        // make sure to keep the existing plugins
-        ...selectedSite.plugins,
-
-        // add your integration’s required plugin(s) here
-        { package: 'netlify-plugin-minify-html' },
-      ].filter(
-        (plugin, index, allPlugins) =>
-          index === allPlugins.findIndex((p) => p.package === plugin.package),
-      );
-
-      // set the env vars and install the build plugin
-      await fetch(`https://api.netlify.com/api/v1/sites/${selectedSite.id}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          build_settings: {
-            env: environmentVariables,
-          },
-          plugins,
-        }),
-      });
-
-      // trigger a new build
-      const response = await fetch(
-        `https://api.netlify.com/api/v1/sites/${selectedSite.id}/builds`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ clear_cache: false }),
-        },
-      ).then((res) => res.json());
-
-      // show a link to see the build in progress
-      setDeploy(response);
-    }
-
-    return (
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="site">
-          Select a site
-          <select
-            id="site"
-            name="site"
-            onChange={(event) => {
-              const site = allSites.find((s) => s.id === event.target.value);
-              setSelectedSite(site);
-            }}
-            defaultValue=""
-          >
-            <option disabled value="">
-              -- please choose a site to configure --
-            </option>
-            {allSites.map((site) => (
-              <option key={site.id} value={site.id}>
-                {site.ssl_url}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button>Configure Your Site</button>
-      </form>
-    );
-  }
-
-  if (token && loading) {
-    return <p>loading your sites...</p>;
-  }
-
-  if (!token) {
-    return <button onClick={handleAuth}>Connect Your Netlify Account</button>;
-  }
-  // if the user hasn’t authenticated, show them the OAuth button
-  return null;
+  // if the user has not authorized the app yet, show an auth button
+  return (
+    <div className={styles.auth}>
+      <h1>Add Our Integration To Your Netlify Site!</h1>
+      <p>
+        Click the button below to integrate our great service with your Netlify
+        site!
+      </p>
+      <button onClick={() => redirectToAuth()}>
+        Connect Your Netlify Account
+      </button>
+    </div>
+  );
 }
