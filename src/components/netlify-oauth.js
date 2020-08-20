@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { redirectToAuth, getTokenFromHash } from '../util/auth.js';
 import { updateSiteSettings, createDeploy } from '../util/netlify-api';
 import { SelectSite } from './select-site';
-import styles from '../styles/app.module.css';
+import styles from '../styles/netlify-oauth.module.css';
 
 export function NetlifyOAuth() {
   const [token, setToken] = useState();

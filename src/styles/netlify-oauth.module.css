@@ -1,0 +1,24 @@
+.auth {
+  text-align: center;
+}
+
+.auth h1 {
+  margin: 0;
+}
+
+.auth p {
+  margin: 1rem 0 2rem;
+}
+
+.auth button {
+  background: teal;
+  border: 0;
+  border-radius: 0.5rem;
+  color: white;
+  display: block;
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin: 0 auto;
+  padding: 1rem 0.5rem;
+  width: 300px;
+}

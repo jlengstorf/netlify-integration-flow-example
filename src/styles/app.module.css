@@ -1,12 +1,13 @@
 .header {
-  background: teal;
+  background: white;
+  border-bottom: 1px solid teal;
   margin: 0;
   padding: 1rem 5vw;
 }
 
 .title {
-  color: white;
-  font-size: 1.5rem;
+  color: #222;
+  font-size: 1.25rem;
   font-weight: bold;
   margin: 0;
 }
@@ -18,31 +19,6 @@
   width: 90vw;
 }
 
-.auth {
-  text-align: center;
-}
-
-.auth h1 {
-  margin: 0;
-}
-
-.auth p {
-  margin: 1rem 0 2rem;
-}
-
-button {
-  background: teal;
-  border: 0;
-  border-radius: 0.5rem;
-  color: white;
-  display: block;
-  font-size: 1.125rem;
-  font-weight: bold;
-  margin: 0 auto;
-  padding: 1rem 0.5rem;
-  width: 300px;
-}
-
 .footer {
   color: #777;
   font-size: 0.875rem;
@@ -52,4 +28,14 @@ button {
 
 .footer p {
   margin: 0;
+}
+
+.footer a {
+  color: inherit;
+}
+
+.footer img {
+  display: inline-block;
+  vertical-align: middle;
+  width: 20px;
 }

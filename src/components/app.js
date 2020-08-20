@@ -12,7 +12,21 @@ export function App() {
         <NetlifyOAuth />
       </main>
       <footer className={styles.footer}>
-        <p>TODO add links to source, etc.</p>
+        <p>
+          created with{' '}
+          <img
+            src="https://res.cloudinary.com/jlengstorf/image/upload/f_auto,q_auto,w_60/v1596146333/netlify/netliheart.png"
+            alt="love"
+          />{' '}
+          by your friends at{' '}
+          <a href="https://www.netlify.com/?utm_source=github&utm_medium=integrations-jl&utm_campaign=devex">
+            Netlify
+          </a>{' '}
+          ·{' '}
+          <a href="https://github.com/jlengstorf/netlify-integration-flow-example">
+            source code & docs
+          </a>
+        </p>
       </footer>
     </>
   );
